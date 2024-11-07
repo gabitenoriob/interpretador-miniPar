@@ -61,27 +61,4 @@ def tokenize(code):
     
     return tokens
 
-def main():
-    code = """
-    SEQ {
-        x = 5;
-        if (Bool) {
-            send x to c_channel;
-        } else {
-            receive y from c_channel;
-        }
-        while (Bool) {
-            x = x + 1;
-        }
-    }
-    """
-    
-    try:
-        tokens = tokenize(code)
-        for token in tokens:
-            print(token)
-    except ValueError as e:
-        print(e)
 
-if __name__ == '__main__':
-    main()

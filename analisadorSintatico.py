@@ -96,25 +96,4 @@ class MiniParParser:
         else:
             raise SyntaxError(f"Esperado '{token_type}', mas encontrado '{self.current_token}'.")
 
-def main():
-    code = """
-    SEQ {
-        x = 5;
-        if (Bool) {
-            send x to c_channel;
-        } else {
-            receive y from c_channel;
-        }
-    }
-    """
-    
-    try:
-        tokens = tokenize(code)
-        parser = MiniParParser(tokens)
-        parser.parse()
-        print("Análise sintática bem-sucedida!")
-    except (ValueError, SyntaxError) as e:
-        print(e)
 
-if __name__ == '__main__':
-    main()

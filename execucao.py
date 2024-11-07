@@ -177,4 +177,4 @@ def run_minipar(file_path):
         print("Erros na análise semântica.")
 
 if __name__ == "__main__":
-    run_minipar("caminho/do/seu/arquivo.mp")
+    run_minipar("teste1.mp")
