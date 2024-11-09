@@ -21,7 +21,7 @@ TOKENS = {
     'C_CHANNEL': r'\bc_channel\b',
     'SEND': r'\bsend\b',
     'RECEIVE': r'\breceive\b',
-    'IDENTIFIER': r'[a-zA-Z_][a-zA-Z0-9_]*',
+    'IDENTIFIER': r'[a-zA-Z_][a-zA-Z0-9_\.]*',  # Permite ponto em identificadores
     'ASSIGN': r'=',
     'PLUS': r'\+',
     'MINUS': r'-',

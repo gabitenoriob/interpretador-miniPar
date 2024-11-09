@@ -14,6 +14,15 @@ class SymbolTable:
             raise Exception(f"Erro: A variável '{name}' não foi declarada.")
         return self.symbols[name]
 
+    def check(self, program):
+        """Verifica a semântica do programa."""
+        for statement in program:
+            if statement[0] == 'IDENTIFIER':
+                var_name = statement[1]
+                # Verifica se a variável foi definida antes de ser usada
+                self.lookup(var_name)
+
+
 class MiniParParser:
     def __init__(self, tokens):
         self.tokens = tokens
@@ -21,8 +30,8 @@ class MiniParParser:
         self.current_token = self.tokens[self.current_token_index] if tokens else None
         self.symbol_table = SymbolTable()  # Inicializa a tabela de símbolos
 
+    # Função para avançar para o próximo token
     def advance(self):
-        """Avança para o próximo token."""
         self.current_token_index += 1
         if self.current_token_index < len(self.tokens):
             self.current_token = self.tokens[self.current_token_index]
@@ -36,6 +45,8 @@ class MiniParParser:
     def programa_minipar(self):
         """Verifica a produção 'programa_minipar'."""
         self.bloco_stmt()
+        # Após a análise sintática, verificamos a semântica
+        self.symbol_table.check(self.tokens)  # Verificação semântica
 
     def bloco_stmt(self):
         """Verifica a produção 'bloco_stmt'."""
@@ -74,7 +85,7 @@ class MiniParParser:
         self.match('IDENTIFIER')
         self.match('ASSIGN')
         self.expr()
-        self.symbol_table.define(var_name, "int")  # Defina o tipo como int para a atribuição
+        self.symbol_table.define(var_name, "int")  # Define o tipo como 'int' para a atribuição
 
     def if_stmt(self):
         """Verifica a produção 'if'."""
@@ -103,8 +114,8 @@ class MiniParParser:
         """Verifica a produção 'expr'."""
         self.match('IDENTIFIER')  # Exemplo de simplificação
         while self.current_token and self.current_token[0] in ('+', '-', '*', '/'):
-            self.match(self.current_token[0])  # avança no operador
-            self.match('IDENTIFIER')  # avança no operando
+            self.match(self.current_token[0])  # Avança no operador
+            self.match('IDENTIFIER')  # Avança no operando
 
     def match(self, token_type):
         """Verifica se o próximo token é do tipo esperado."""
@@ -112,5 +123,6 @@ class MiniParParser:
             self.advance()
         else:
             raise SyntaxError(f"Esperado '{token_type}', mas encontrado '{self.current_token}'.")
+
 
 

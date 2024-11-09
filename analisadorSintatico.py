@@ -21,7 +21,19 @@ class MiniParParser:
 
     def programa_minipar(self):
         """Verifica a produção 'programa_minipar'."""
+        # Trata declarações de canal antes do bloco principal
+        while self.current_token and self.current_token[0] == 'C_CHANNEL':
+            self.declaracao_canal()
+        
+        # Continua com o bloco de instruções principal
         self.bloco_stmt()
+
+    def declaracao_canal(self):
+        """Verifica a produção de declaração de canal."""
+        self.match('C_CHANNEL')
+        while self.current_token and self.current_token[0] == 'IDENTIFIER':
+            self.match('IDENTIFIER')
+
 
     def bloco_stmt(self):
         """Verifica a produção 'bloco_stmt'."""
@@ -48,7 +60,12 @@ class MiniParParser:
         """Verifica a produção 'stmts'."""
         while self.current_token:
             if self.current_token[0] == 'IDENTIFIER':
-                self.atribuição()
+                # Verifica se é uma chamada de função ou uma atribuição
+                next_index = self.current_token_index + 1
+                if next_index < len(self.tokens) and self.tokens[next_index][0] == 'LPAREN':
+                    self.func_call()  # Trata chamada de função
+                else:
+                    self.atribuição()  # Trata atribuição
             elif self.current_token[0] == 'IF':
                 self.if_stmt()
             elif self.current_token[0] == 'WHILE':
@@ -56,11 +73,17 @@ class MiniParParser:
             else:
                 break
 
-    def atribuição(self):
-        """Verifica a produção 'atribuição'."""
+    def func_call(self):
+        """Verifica a produção de chamada de função."""
         self.match('IDENTIFIER')
-        self.match('ASSIGN')
-        self.expr()
+        self.match('LPAREN')
+        # Lida com argumentos de função, se houver
+        while self.current_token and self.current_token[0] != 'RPAREN':
+            self.expr()  # Processa argumentos de forma recursiva
+            if self.current_token and self.current_token[0] == 'COMMA':
+                self.match('COMMA')
+        self.match('RPAREN')  # Finaliza a chamada de função
+
 
     def if_stmt(self):
         """Verifica a produção 'if'."""
@@ -85,12 +108,33 @@ class MiniParParser:
         """Verifica a expressão booleana."""
         self.match('BOOL')
 
+    def atribuição(self):
+        """Verifica a produção 'atribuição'."""
+        self.match('IDENTIFIER')
+        self.match('ASSIGN')
+        self.expr()  # Permite chamadas de função ou expressões completas
+
     def expr(self):
         """Verifica a produção 'expr'."""
-        self.match('IDENTIFIER')  # Exemplo de simplificação
-        while self.current_token and self.current_token[0] in ('+', '-', '*', '/'):
-            self.match(self.current_token[0])  # avança no operador
-            self.match('IDENTIFIER')  # avança no operando
+        if self.current_token[0] == 'IDENTIFIER':
+            self.match('IDENTIFIER')
+            if self.current_token and self.current_token[0] == 'LPAREN':
+                self.match('LPAREN')
+                # Lida com argumentos de função, se houver
+                while self.current_token and self.current_token[0] != 'RPAREN':
+                    self.expr()  # Processa argumentos de forma recursiva
+                    if self.current_token and self.current_token[0] == 'COMMA':
+                        self.match('COMMA')
+                self.match('RPAREN')  # Finaliza a chamada de função
+        elif self.current_token[0] == 'STRING':
+            # Lida com uma string de solicitação de entrada do usuário
+            print(self.current_token[1])  # Exibe a mensagem no terminal
+            resposta = input()  # Captura a resposta do usuário
+            print(f"Resposta: {resposta}")  # Você pode fazer algo com a resposta depois
+            self.advance()  # Avança para o próximo token
+        else:
+            raise SyntaxError(f"Esperado 'IDENTIFIER' ou expressão, mas encontrado '{self.current_token}'.")
+
 
     def match(self, token_type):
         """Verifica se o próximo token é do tipo esperado."""
