@@ -1,3 +1,4 @@
+import argparse
 import analisadorLexico
 import analisadorSemantico
 import analisadorSintatico
@@ -165,7 +166,9 @@ def run_minipar(file_path):
     print("Tokens gerados:", tokens)
 
     # Analisador Sintático
-    parsed_code = analisadorSintatico.parse(tokens)
+    parser = analisadorSintatico.MiniParParser(tokens)
+    parsed_code = parser.parse()  # Chama o método parse() da instância parser
+
     print("Código parseado:", parsed_code)
 
     # Analisador Semântico
@@ -176,5 +179,34 @@ def run_minipar(file_path):
     else:
         print("Erros na análise semântica.")
 
+def client_thread(file_path):
+    run_minipar(file_path)
+
+def server_thread():
+    # Aqui você pode definir a lógica do servidor
+    host = 'localhost'
+    port = 9999
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind((host, port))
+    server_socket.listen(5)
+    print(f"Servidor rodando em {host}:{port}...")
+    
+    while True:
+        client_socket, address = server_socket.accept()
+        print(f"Conexão com {address}")
+        client_socket.close()
+
 if __name__ == "__main__":
-    run_minipar("teste1.mp")
+    parser = argparse.ArgumentParser(description="Executar MiniPar com cliente e servidor.")
+    parser.add_argument('file', help="Caminho do arquivo MiniPar (.mp)")
+    args = parser.parse_args()
+
+    # Inicia as threads para o cliente e o servidor
+    client = threading.Thread(target=client_thread, args=(args.file,))
+    server = threading.Thread(target=server_thread)
+    
+    client.start()
+    server.start()
+
+    client.join()
+    server.join()

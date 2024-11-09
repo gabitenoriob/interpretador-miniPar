@@ -1,4 +1,3 @@
-programa-minipar
 # Teste de execução paralela para cálculo do fatorial e série de Fibonacci
 
 PAR

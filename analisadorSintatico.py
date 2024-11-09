@@ -17,6 +17,7 @@ class MiniParParser:
     def parse(self):
         """Inicia a análise do programa MiniPar."""
         self.programa_minipar()
+        return self.tokens  # Retorna a estrutura ou resultado da análise
 
     def programa_minipar(self):
         """Verifica a produção 'programa_minipar'."""
@@ -24,12 +25,14 @@ class MiniParParser:
 
     def bloco_stmt(self):
         """Verifica a produção 'bloco_stmt'."""
-        if self.current_token[0] == 'SEQ':
+        print(f"Token atual: {self.current_token}")  # Verifique o token no momento da análise
+        if self.current_token and self.current_token[0] == 'SEQ':
             self.bloco_SEQ()
-        elif self.current_token[0] == 'PAR':
+        elif self.current_token and self.current_token[0] == 'PAR':
             self.bloco_PAR()
         else:
-            raise SyntaxError("Esperado 'SEQ' ou 'PAR'.")
+            raise SyntaxError(f"Esperado 'SEQ' ou 'PAR', mas encontrado '{self.current_token}'.")
+
 
     def bloco_SEQ(self):
         """Verifica a produção 'bloco_SEQ'."""
@@ -95,5 +98,3 @@ class MiniParParser:
             self.advance()
         else:
             raise SyntaxError(f"Esperado '{token_type}', mas encontrado '{self.current_token}'.")
-
-

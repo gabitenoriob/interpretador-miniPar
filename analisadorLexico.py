@@ -23,6 +23,18 @@ TOKENS = {
     'RECEIVE': r'\breceive\b',
     'IDENTIFIER': r'[a-zA-Z_][a-zA-Z0-9_]*',
     'ASSIGN': r'=',
+    'PLUS': r'\+',
+    'MINUS': r'-',
+    'MULTIPLY': r'\*',
+    'DIVIDE': r'/',
+    'STRING': r'"[^"\n]*"',  
+    'COMMA': r',', 
+    'GT': r'>',  # Operador 'maior que'
+    'LT': r'<',  # Operador 'menor que'
+    'GE': r'>=',  # Operador 'maior ou igual a'
+    'LE': r'<=',  # Operador 'menor ou igual a'
+    'EQ': r'==',  # Operador 'igual a'
+    'NE': r'!=',  # Operador 'diferente de'
     'WHITESPACE': r'\s+',
     'COMMENT': r'#[^\n]*',
     'NUMBER': r'\d+',
@@ -33,6 +45,8 @@ TOKENS = {
     'SEMICOLON': r';',
     'INVALID': r'.'
 }
+
+
 
 # Compilando expressões regulares
 token_regex = '|'.join(f'(?P<{name}>{pattern})' for name, pattern in TOKENS.items())
