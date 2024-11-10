@@ -8,13 +8,13 @@ SEQ
     calculadora.receive(operacao, valor1, valor2, resultado)
 
     # Executa o cálculo com base na operação solicitada
-    if (operacao == "+")
+    if (operacao = "+")
         resultado = valor1 + valor2
-    else if (operacao == "-")
+    else if (operacao = "-")
         resultado = valor1 - valor2
-    else if (operacao == "*")
+    else if (operacao = "*")
         resultado = valor1 * valor2
-    else if (operacao == "/")
+    else if (operacao = "/")
         resultado = valor1 / valor2
     else
         print("Operação inválida")

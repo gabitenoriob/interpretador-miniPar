@@ -4,6 +4,8 @@ import analisadorSemantico
 import analisadorSintatico
 import socket
 import threading
+from analisadorSemantico import check
+
 
 has_error = False
 symbol_table = {}
@@ -183,7 +185,7 @@ def client_thread(file_path):
     run_minipar(file_path)
 
 def server_thread():
-    # Aqui você pode definir a lógica do servidor
+   
     host = 'localhost'
     port = 9999
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

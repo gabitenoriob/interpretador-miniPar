@@ -1,4 +1,7 @@
 from analisadorLexico import tokenize
+from analisadorSemantico import SymbolTable
+
+
 
 class MiniParParser:
     def __init__(self, tokens):
@@ -105,8 +108,19 @@ class MiniParParser:
         self.stmts()
 
     def bool_expr(self):
-        """Verifica a expressão booleana."""
-        self.match('BOOL')
+        if self.current_token[0] in ['IDENTIFIER', 'STRING']:
+            self.match(self.current_token[0])
+            if self.current_token[1] == '=':
+                self.match('ASSIGN')
+                if self.current_token[0] in ['IDENTIFIER', 'STRING']:
+                    self.match(self.current_token[0])
+                    return True
+            else:
+                raise SyntaxError("Operador de comparação esperado ('=').")
+        else:
+            raise SyntaxError("Expressão booleana inválida.")
+
+
 
     def atribuição(self):
         """Verifica a produção 'atribuição'."""

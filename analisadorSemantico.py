@@ -15,12 +15,31 @@ class SymbolTable:
         return self.symbols[name]
 
     def check(self, program):
-        """Verifica a semântica do programa."""
+        """Verifica a semântica do programa com base nos tokens."""
         for statement in program:
-            if statement[0] == 'IDENTIFIER':
+            token_type = statement[0]
+            if token_type == 'IDENTIFIER':
                 var_name = statement[1]
-                # Verifica se a variável foi definida antes de ser usada
-                self.lookup(var_name)
+                self.lookup(var_name)  # Verifica se a variável foi declarada
+            elif token_type in {'SEND', 'RECEIVE'}:
+                # Verifica o uso correto de operações de comunicação
+                var_name = statement[1]
+                self.lookup(var_name)  # Verifica se o canal/variável foi declarado
+            elif token_type in {'IF', 'WHILE'}:
+                # Verifica se a condição contém variáveis declaradas
+                condition = statement[1]  # Supondo que a condição seja passada como lista de tokens
+                for token in condition:
+                    if token[0] == 'IDENTIFIER':
+                        self.lookup(token[1])  # Verifica variáveis na condição
+            elif token_type == 'ASSIGN':
+                var_name = statement[1]
+                self.lookup(var_name)  # Verifica se a variável existe para a atribuição
+                expression = statement[2]  # Supondo que a expressão seja uma lista de tokens
+                for token in expression:
+                    if token[0] == 'IDENTIFIER':
+                        self.lookup(token[1])  # Verifica variáveis na expressão
+            # Adiciona outros casos de tokens conforme necessário
+
 
 
 class MiniParParser:
