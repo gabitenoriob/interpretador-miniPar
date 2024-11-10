@@ -17,7 +17,7 @@ SEQ
     else if (operacao = "/")
         resultado = valor1 / valor2
     else
-        print("Operação inválida")
+        Output("Operação inválida")
 
     # Retorna o resultado para o cliente (computador_1)
     calculadora.send(operacao, valor1, valor2, resultado)

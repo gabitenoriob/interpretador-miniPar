@@ -4,7 +4,6 @@ import analisadorSemantico
 import analisadorSintatico
 import socket
 import threading
-from analisadorSemantico import check
 
 
 has_error = False

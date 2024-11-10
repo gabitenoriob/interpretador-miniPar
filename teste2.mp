@@ -1,26 +1,34 @@
 # Teste de execução paralela para cálculo do fatorial e série de Fibonacci
 
+SEQ
+# Inicializando variaveis para cálculo do fatorial
+numero = 9
+fatorial = 1
+i = 1
+
+# Inicializando variáveis para serie de fibonnaci
+n = 20  # Número de termos da série Fibonacci
+a = 0   #primeiro termo
+b = 1   #segundo termo
+j = 2   #count inicia em 2
+
 PAR
-    # Cálculo do fatorial de um número (thread 1)
-    Int n = 5
-    Int fatorial = 1
-    while (n > 1)
-        fatorial = fatorial * n
-        n = n - 1
-    print("Fatorial calculado: ", fatorial)
+while (i <= numero){
+    fatorial = fatorial * i
+    i = i+1
+}
 
-    # Cálculo da série de Fibonacci (thread 2)
-    Int fib1 = 0
-    Int fib2 = 1
-    Int proximo
-    Int contador = 0
-    Int limite = 10  # número de termos a serem calculados
+Output("Série de Fibonacci com ",n," termos:\n\n")    
+Output(a, " ")
+Output(b, " ")
 
-    while (contador < limite)
-        print("Termo ", contador + 1, ": ", fib1)
-        proximo = fib1 + fib2
-        fib1 = fib2
-        fib2 = proximo
-        contador = contador + 1
-
-    # As threads serão executadas simultaneamente
+while (j < n ){
+    c = a + b
+    Output(c, " ")
+    a = b
+    b = c
+    j = j+1
+}
+Output("\n\n")
+SEQ
+Output("fatorial(",numero,") = ", fatorial, "\n")

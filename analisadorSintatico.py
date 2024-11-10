@@ -1,8 +1,6 @@
 from analisadorLexico import tokenize
 from analisadorSemantico import SymbolTable
 
-
-
 class MiniParParser:
     def __init__(self, tokens):
         self.tokens = tokens
@@ -24,11 +22,8 @@ class MiniParParser:
 
     def programa_minipar(self):
         """Verifica a produção 'programa_minipar'."""
-        # Trata declarações de canal antes do bloco principal
         while self.current_token and self.current_token[0] == 'C_CHANNEL':
             self.declaracao_canal()
-        
-        # Continua com o bloco de instruções principal
         self.bloco_stmt()
 
     def declaracao_canal(self):
@@ -37,17 +32,14 @@ class MiniParParser:
         while self.current_token and self.current_token[0] == 'IDENTIFIER':
             self.match('IDENTIFIER')
 
-
     def bloco_stmt(self):
         """Verifica a produção 'bloco_stmt'."""
-        print(f"Token atual: {self.current_token}")  # Verifique o token no momento da análise
         if self.current_token and self.current_token[0] == 'SEQ':
             self.bloco_SEQ()
         elif self.current_token and self.current_token[0] == 'PAR':
             self.bloco_PAR()
         else:
             raise SyntaxError(f"Esperado 'SEQ' ou 'PAR', mas encontrado '{self.current_token}'.")
-
 
     def bloco_SEQ(self):
         """Verifica a produção 'bloco_SEQ'."""
@@ -80,13 +72,11 @@ class MiniParParser:
         """Verifica a produção de chamada de função."""
         self.match('IDENTIFIER')
         self.match('LPAREN')
-        # Lida com argumentos de função, se houver
         while self.current_token and self.current_token[0] != 'RPAREN':
             self.expr()  # Processa argumentos de forma recursiva
             if self.current_token and self.current_token[0] == 'COMMA':
                 self.match('COMMA')
         self.match('RPAREN')  # Finaliza a chamada de função
-
 
     def if_stmt(self):
         """Verifica a produção 'if'."""
@@ -108,6 +98,7 @@ class MiniParParser:
         self.stmts()
 
     def bool_expr(self):
+        """Verifica a expressão booleana."""
         if self.current_token[0] in ['IDENTIFIER', 'STRING']:
             self.match(self.current_token[0])
             if self.current_token[1] == '=':
@@ -120,13 +111,11 @@ class MiniParParser:
         else:
             raise SyntaxError("Expressão booleana inválida.")
 
-
-
     def atribuição(self):
         """Verifica a produção 'atribuição'."""
         self.match('IDENTIFIER')
         self.match('ASSIGN')
-        self.expr()  # Permite chamadas de função ou expressões completas
+        self.expr()
 
     def expr(self):
         """Verifica a produção 'expr'."""
@@ -134,20 +123,18 @@ class MiniParParser:
             self.match('IDENTIFIER')
             if self.current_token and self.current_token[0] == 'LPAREN':
                 self.match('LPAREN')
-                # Lida com argumentos de função, se houver
                 while self.current_token and self.current_token[0] != 'RPAREN':
                     self.expr()  # Processa argumentos de forma recursiva
                     if self.current_token and self.current_token[0] == 'COMMA':
                         self.match('COMMA')
                 self.match('RPAREN')  # Finaliza a chamada de função
+        elif self.current_token[0] == 'NUMBER':
+            # Agora lidamos com números
+            self.match('NUMBER')
         elif self.current_token[0] == 'STRING':
-            # Lida com uma string de solicitação de entrada do usuário
-            print(self.current_token[1])  # Exibe a mensagem no terminal
-            resposta = input()  # Captura a resposta do usuário
-            print(f"Resposta: {resposta}")  # Você pode fazer algo com a resposta depois
-            self.advance()  # Avança para o próximo token
+            self.match('STRING')
         else:
-            raise SyntaxError(f"Esperado 'IDENTIFIER' ou expressão, mas encontrado '{self.current_token}'.")
+            raise SyntaxError(f"Esperado 'IDENTIFIER', 'NUMBER' ou expressão, mas encontrado '{self.current_token}'.")
 
 
     def match(self, token_type):
