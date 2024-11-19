@@ -17,7 +17,7 @@ class SymbolTable:
         return self.symbols[name]
 
     def check(self, program):
-        """Verifica a semântica do programa."""
+        """Verifica a semântica do programa.""" 
         for statement in program:
             token_type = statement[0]
             if token_type == 'IDENTIFIER':
@@ -33,7 +33,7 @@ class SymbolTable:
                         self.lookup(token[1])
             elif token_type == 'ASSIGN':
                 var_name = statement[1]
-                self.lookup(var_name)
+                self.lookup(var_name)  # Verifica a variável
                 expression = statement[2]
                 for token in expression:
                     if token[0] == 'IDENTIFIER':
@@ -45,6 +45,7 @@ class MiniParParser:
         self.current_token_index = 0
         self.current_token = self.tokens[self.current_token_index] if tokens else None
         self.symbol_table = SymbolTable()
+        self.program = []
 
     def advance(self):
         """Avança para o próximo token."""
@@ -59,10 +60,12 @@ class MiniParParser:
         self.programa_minipar()
 
     def programa_minipar(self):
+        """Inicia a análise do programa completo."""
         self.bloco_stmt()
-        self.symbol_table.check(self.tokens)
+        self.symbol_table.check(self.program)
 
     def bloco_stmt(self):
+        """Analisa um bloco de sentenças (SEQ ou PAR)."""
         if self.current_token[0] == 'SEQ':
             self.bloco_SEQ()
         elif self.current_token[0] == 'PAR':
@@ -71,14 +74,17 @@ class MiniParParser:
             raise SyntaxError("Esperado 'SEQ' ou 'PAR'.")
 
     def bloco_SEQ(self):
+        """Analisa um bloco SEQ."""
         self.match('SEQ')
         self.stmts()
 
     def bloco_PAR(self):
+        """Analisa um bloco PAR."""
         self.match('PAR')
         self.stmts()
 
     def stmts(self):
+        """Analisa uma lista de sentenças."""
         while self.current_token:
             if self.current_token[0] == 'IDENTIFIER':
                 self.atribuicao()
@@ -92,30 +98,37 @@ class MiniParParser:
                 break
 
     def atribuicao(self):
+        """Analisa uma sentença de atribuição."""
         var_name = self.current_token[1]
         self.match('IDENTIFIER')
         self.match('ASSIGN')
-        self.expr()
-        self.symbol_table.define(var_name, "int")  # Supondo tipo padrão 'int'
+        expr_result = self.expr()
+        self.symbol_table.define(var_name, "int")  # Supondo tipo 'int'
+        self.program.append(('ASSIGN', var_name, expr_result))  # Adiciona à lista de sentenças
 
     def if_stmt(self):
+        """Analisa uma sentença de IF."""
         self.match('IF')
         self.match('LPAREN')
-        self.bool_expr()
+        condition = self.bool_expr()
         self.match('RPAREN')
         self.stmts()
         if self.current_token and self.current_token[0] == 'ELSE':
             self.match('ELSE')
             self.stmts()
+        self.program.append(('IF', condition))
 
     def while_stmt(self):
+        """Analisa uma sentença de WHILE."""
         self.match('WHILE')
         self.match('LPAREN')
-        self.bool_expr()
+        condition = self.bool_expr()
         self.match('RPAREN')
         self.stmts()
+        self.program.append(('WHILE', condition))
 
     def canal_com(self):
+        """Analisa uma comunicação de canal."""
         self.match('C_CHANNEL')
         channel_name = self.current_token[1]
         self.match('IDENTIFIER')  # Nome do canal
@@ -124,19 +137,28 @@ class MiniParParser:
         receiver = self.current_token[1]
         self.match('IDENTIFIER')  # Receptor
         self.symbol_table.define(channel_name, "channel")  # Define canal
+        self.program.append(('C_CHANNEL', channel_name, sender, receiver))
 
     def bool_expr(self):
+        """Analisa expressões booleanas."""
         self.match('BOOL')
+        return self.current_token[1]  # Retorna o valor da expressão booleana
 
     def expr(self):
-        self.match('IDENTIFIER')
+        """Analisa uma expressão (operadores aritméticos)."""
+        left = self.match('IDENTIFIER')  # Inicia com um identificador
         while self.current_token and self.current_token[0] in ('+', '-', '*', '/'):
-            self.match(self.current_token[0])
-            self.match('IDENTIFIER')
+            op = self.current_token[0]
+            self.advance()  # Avança para o próximo token (operador)
+            right = self.match('IDENTIFIER')  # Próximo identificador
+            left = (op, left, right)
+        return left
 
     def match(self, token_type):
+        """Compara o token atual com o esperado e avança."""
         if self.current_token and self.current_token[0] == token_type:
+            token = self.current_token
             self.advance()
+            return token[1]  # Retorna o valor do token
         else:
             raise SyntaxError(f"Esperado '{token_type}', mas encontrado '{self.current_token}'.")
-

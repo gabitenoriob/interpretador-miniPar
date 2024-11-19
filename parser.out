@@ -8,12 +8,13 @@ Unused terminals:
     EQ
     GE
     GT
+    IDENTIFIER
     LE
     LT
+    MULTIPLY
     NE
-    RECEIVE
+    NUMBER
     SEMICOLON
-    SEND
 
 Grammar
 
@@ -56,55 +57,61 @@ Rule 35    expr -> expr LESS_THAN_EQUALS expr
 Rule 36    expr -> expr GREATER_THAN_EQUALS expr
 Rule 37    expr -> expr EQUALS_EQUALS expr
 Rule 38    expr -> expr NOT_EQUALS expr
-Rule 39    termo -> fator
-Rule 40    termo -> termo MULTIPLY fator
-Rule 41    termo -> termo DIVIDE fator
-Rule 42    fator -> IDENTIFIER
-Rule 43    fator -> NUMBER
-Rule 44    canal_com -> C_CHANNEL IDENTIFIER IDENTIFIER IDENTIFIER
+Rule 39    expr -> ID
+Rule 40    bool -> expr
+Rule 41    comment -> COMMENT
+Rule 42    c_channel -> C_CHANNEL ID LPAREN STRING COMMA STRING RPAREN
+Rule 43    c_channel_stmt -> send_stmt
+Rule 44    c_channel_stmt -> receive_stmt
+Rule 45    send_stmt -> ID DOT SEND LPAREN ID COMMA expr COMMA expr COMMA expr RPAREN
+Rule 46    send_stmt -> ID DOT SEND LPAREN ID RPAREN
+Rule 47    receive_stmt -> ID DOT RECEIVE LPAREN ID COMMA expr COMMA expr COMMA expr RPAREN
+Rule 48    receive_stmt -> ID DOT RECEIVE LPAREN ID RPAREN
 
 Terminals, with rules where they appear
 
 ASSIGN               : 
 BOOL                 : 
-COMMA                : 13
-C_CHANNEL            : 44
-DIVIDE               : 32 41
+COMMA                : 13 42 45 45 45 47 47 47
+C_CHANNEL            : 42
+DIVIDE               : 32
 ELSE                 : 
 EQ                   : 
+EQUALS               : 23 24 25 26
 GE                   : 
 GT                   : 
-IDENTIFIER           : 42 44 44 44
+ID                   : 23 24 25 26 39 42 45 45 46 46 47 47 48 48
+IDENTIFIER           : 
 IF                   : 8
 INPUT                : 10
 LBRACE               : 8 9
 LE                   : 
-LPAREN               : 8 9 10 11
+LPAREN               : 8 9 10 11 42 45 46 47 48
 LT                   : 
 MINUS                : 30
-MULTIPLY             : 40
+MULTIPLY             : 
 NE                   : 
-NUMBER               : 43
+NUMBER               : 
 OUTPUT               : 11
 PAR                  : 7
 PLUS                 : 29
 RBRACE               : 8 9
-RECEIVE              : 
-RPAREN               : 8 9 10 11
+RECEIVE              : 47 48
+RPAREN               : 8 9 10 11 42 45 46 47 48
 SEMICOLON            : 
-SEND                 : 
+SEND                 : 45 46
 SEQ                  : 6
-STRING               : 24 28
+STRING               : 24 28 42 42
 WHILE                : 9
 error                : 
 
 Nonterminals, with rules where they appear
 
-EQUALS               : 23 24 25 26
+COMMENT              : 41
+DOT                  : 45 46 47 48
 EQUALS_EQUALS        : 37
 GREATER_THAN         : 34
 GREATER_THAN_EQUALS  : 36
-ID                   : 23 24 25 26
 INT                  : 27
 LESS_THAN            : 33
 LESS_THAN_EQUALS     : 35
@@ -121,13 +128,12 @@ bloco_stmt           : 1 4 5
 bool                 : 8 9
 c_channel            : 21
 c_channel_stmt       : 22
-canal_com            : 
-expr                 : 12 13 23 29 29 30 30 31 31 32 32 33 33 34 34 35 35 36 36 37 37 38 38
-fator                : 39 40 41
+comment              : 
+expr                 : 12 13 23 29 29 30 30 31 31 32 32 33 33 34 34 35 35 36 36 37 37 38 38 40 45 45 45 47 47 47
 output_args          : 11 13
 programa_minipar     : 0
-receive_stmt         : 26
+receive_stmt         : 26 44
+send_stmt            : 43
 stmt                 : 14 15
 stmts                : 6 7 8 9 15
-termo                : 40 41
 

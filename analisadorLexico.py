@@ -1,23 +1,6 @@
-#Gramática
-# <programa_minipar> ::= <bloco_stmt>
-# <bloco_stmt> ::= <bloco_SEQ> | <bloco_PAR>
-# <bloco_SEQ> ::= SEQ (<stmts>)
-# <bloco_PAR> ::= PAR (<stmts>)
-# <stmts> ::= <stmt> | <stmt>; <stmts>
-# <stmt> ::= <atribuição> | <if_stmt> | <while_stmt> | <canal_com>
-# <atribuição> ::= <id> = <expr>
-# <if_stmt> ::= if (<bool>) <stmt> | if (<bool>) <stmt> else <stmt>
-# <while_stmt> ::= while (<bool>) <stmt>
-# <expr> ::= <termo> | <expr> + <termo> | <expr> - <termo>
-# <termo> ::= <fator> | <termo> * <fator> | <termo> / <fator>
-# <fator> ::= <id> | <constante>
-# <canal_com> ::= c_channel chan <id> <id_comp1> <id_comp2>
-
-
-
 from ply import lex
 
-# Lista de tokens, incluindo novos comandos
+# Lista de tokens
 tokens = [
     'SEQ', 'PAR', 'IF', 'ELSE', 'WHILE', 'C_CHANNEL',
     'SEND', 'RECEIVE', 'INPUT', 'OUTPUT', 'IDENTIFIER', 
@@ -27,7 +10,7 @@ tokens = [
     'LBRACE', 'RBRACE', 'SEMICOLON', 'BOOL'
 ]
 
-# Regras de palavras-chave (não podem ser identificadores)
+# Regras de palavras-chave
 reserved = {
     'SEQ': 'SEQ',
     'PAR': 'PAR',
@@ -42,7 +25,7 @@ reserved = {
 }
 
 # Regras regulares simples
-t_BOOL = r'\b(True|False)\b'
+t_BOOL = r'\b(True|False)\b'  
 t_ASSIGN = r'='
 t_PLUS = r'\+'
 t_MINUS = r'-'
@@ -61,16 +44,22 @@ t_LBRACE = r'{'
 t_RBRACE = r'}'
 t_SEMICOLON = r';'
 t_STRING = r'"[^"\n]*"'  # Strings entre aspas duplas
+t_ID = r'[a-zA-Z_][a-zA-Z0-9_]*'  # Identificadores, incluindo palavras reservadas
+
+# Função de erro para tokens não reconhecidos
+def t_error(t):
+    print(f"Caractere ilegal {t.value[0]}")
+    t.lexer.skip(1)
 
 # Regras mais complexas
 def t_NUMBER(t):
-    r'\d+'
+    r'\d+'  # Números inteiros
     t.value = int(t.value)  # Converte para número
     return t
 
 def t_IDENTIFIER(t):
-    r'[a-zA-Z_][a-zA-Z0-9_\.]*'
-    t.type = reserved.get(t.value, 'IDENTIFIER')  # Checa palavras-chave
+    r'[a-zA-Z_][a-zA-Z0-9_]*'  # Identificadores válidos
+    t.type = reserved.get(t.value, 'IDENTIFIER')  # Checa se é uma palavra reservada
     return t
 
 # Ignorar espaços e tabulações
@@ -86,13 +75,9 @@ def t_newline(t):
     r'\n+'
     t.lexer.lineno += len(t.value)
 
-# Erros
-def t_error(t):
-    print(f"Erro léxico na linha {t.lineno}: token inválido '{t.value[0]}'")
-    t.lexer.skip(1)
-
 # Construindo o analisador léxico
 lexer = lex.lex()
+
 def tokenize(input_string):
     lexer.input(input_string)
     tokens = []

@@ -1,15 +1,17 @@
+import interpretador
 import ply.yacc as yacc
 from analisadorSemantico import SymbolTable
 from analisadorLexico import tokens
-import analisadorSemantico,analisadorLexico,analisadorSintatico
+import analisadorSemantico, analisadorLexico, analisadorSintatico
 
+# Inicializando a tabela de símbolos
+symbol_table = {}
 
 # Definindo precedência para operadores
 precedence = (
     ('left', 'PLUS', 'MINUS'),
     ('left', 'MULTIPLY', 'DIVIDE'),
 )
-
 
 # Definir as regras sintáticas
 def p_programa_minipar(p):
@@ -106,31 +108,67 @@ def p_expr(p):
     else:
         p[0] = (p[2], p[1], p[3])
 
+def p_expr_id(p):
+    '''expr : ID'''
+    if p[1] not in symbol_table:
+        print(f"Erro semântico: identificador '{p[1]}' não declarado")
+        interpretador.has_error = True
+    p[0] = p[1]
 
-def p_termo(p):
-    """termo : fator
-             | termo MULTIPLY fator
-             | termo DIVIDE fator"""
-    if len(p) == 2:
-        p[0] = ('termo', p[1])
-    else:
-        p[0] = ('termo', p[1], p[2], p[3])
+def p_bool(p):
+    '''bool : expr'''
+    p[0] = p[1]
 
-def p_fator(p):
-    """fator : IDENTIFIER
-             | NUMBER"""
-    p[0] = ('fator', p[1])
+def p_comment(p):
+    '''comment : COMMENT'''
+    pass  # Comentários são ignorados, então não fazemos nada
 
-def p_canal_com(p):
-    "canal_com : C_CHANNEL IDENTIFIER IDENTIFIER IDENTIFIER"
-    p[0] = ('canal_com', p[2], p[3], p[4])
+def p_c_channel(p):
+    '''c_channel : C_CHANNEL ID LPAREN STRING COMMA STRING RPAREN'''
+    p[0] = ('C_CHANNEL', p[2], p[4], p[6])
 
-# Regra para erro
+    interpretador.channels[p[2]] = (p[4],p[6])
+
+def p_c_channel_stmt(p):
+    '''c_channel_stmt : send_stmt
+                      | receive_stmt''' 
+    p[0] = p[1]
+
+def p_send_stmt(p):
+    '''send_stmt : ID DOT SEND LPAREN ID COMMA expr COMMA expr COMMA expr RPAREN
+                 | ID DOT SEND LPAREN ID RPAREN'''
+    if len(p) == 7:
+            p[0] = (p[1], 'SEND', p[5])
+    elif len(p) == 13:
+        p[0] = (p[1], 'SEND', p[5], p[7], p[9], p[11])
+    
+    if p[1] not in interpretador.channels:
+        print(f"Erro semântico: identificador '{p[1]}' em '{p[1]}.{p[3]}()' não declarado")
+        interpretador.has_error = True
+
+def p_receive_stmt(p):
+    '''receive_stmt : ID DOT RECEIVE LPAREN ID COMMA expr COMMA expr COMMA expr RPAREN
+                    | ID DOT RECEIVE LPAREN ID RPAREN'''
+    if len(p) == 7:
+            p[0] = (p[1], 'RECEIVE', p[5])
+    elif len(p) == 13:
+        p[0] = (p[1], 'RECEIVE', p[5], p[7], p[9], p[11])
+    
+    if p[1] not in interpretador.channels:
+        print(f"Erro semântico: identificador '{p[1]}' em '{p[1]}.{p[3]}()' não declarado")
+        interpretador.has_error = True
+
 def p_error(p):
+    interpretador.has_error = True
     if p:
-        print(f"Erro de sintaxe próximo ao token: {p.type}, valor: {p.value}")
+        print(f"Erro sintático na linha {p.lineno}, token '{p.value}'")
+        # Trata o erro e recupera a análise
+        
     else:
-        print("Erro de sintaxe: fim inesperado de entrada.")
+        print("Erro sintático: fim de arquivo inesperado")
+
+    parser.errok()
+
 
 # Construindo o parser
 parser = yacc.yacc()
@@ -139,5 +177,3 @@ parser = yacc.yacc()
 def parse_program(code):
     result = parser.parse(code)  
     return result
-
-
