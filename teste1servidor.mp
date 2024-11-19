@@ -1,5 +1,3 @@
-# Programa servidor (computador_2) de uma calculadora aritmética simples
-
 SEQ
     # Recebe a solicitação de operação aritmética
     calculadora.receive(operacao, valor1, valor2, resultado)

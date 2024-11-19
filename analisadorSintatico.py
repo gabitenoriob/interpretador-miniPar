@@ -1,17 +1,16 @@
-import interpretador
 import ply.yacc as yacc
-from analisadorSemantico import SymbolTable
+from analisadorSemantico import SymbolTable 
 from analisadorLexico import tokens
-import analisadorSemantico, analisadorLexico, analisadorSintatico
+import interpretador
 
-# Inicializando a tabela de símbolos
-symbol_table = {}
-
-# Definindo precedência para operadores
+symbol_table = SymbolTable() 
+# Definir precedência dos operadores
 precedence = (
     ('left', 'PLUS', 'MINUS'),
-    ('left', 'MULTIPLY', 'DIVIDE'),
+    ('left', 'TIMES', 'DIVIDE'),
+    ('nonassoc', 'LESS_THAN', 'GREATER_THAN', 'LESS_THAN_EQUALS', 'GREATER_THAN_EQUALS', 'EQUALS_EQUALS', 'NOT_EQUALS'),
 )
+
 
 # Definir as regras sintáticas
 def p_programa_minipar(p):
@@ -83,10 +82,10 @@ def p_atribuicao(p):
                   | ID EQUALS STRING
                   | ID EQUALS bloco_INPUT
                   | ID EQUALS receive_stmt'''
-                  
     p[0] = ('=', p[1], p[3])
-    if p[1] not in symbol_table: 
-        symbol_table[p[1]] = p[3]
+    if p[1] not in symbol_table.symbols:
+        symbol_table.symbols[p[1]] = p[3]  # Definindo a variável ou canal
+
 
 def p_expr(p):
     '''expr : INT
@@ -110,10 +109,11 @@ def p_expr(p):
 
 def p_expr_id(p):
     '''expr : ID'''
-    if p[1] not in symbol_table:
+    if p[1] not in symbol_table.symbols:
         print(f"Erro semântico: identificador '{p[1]}' não declarado")
         interpretador.has_error = True
     p[0] = p[1]
+
 
 def p_bool(p):
     '''bool : expr'''
@@ -168,12 +168,6 @@ def p_error(p):
         print("Erro sintático: fim de arquivo inesperado")
 
     parser.errok()
-
-
-# Construindo o parser
+    
+# Criar o analisador sintático
 parser = yacc.yacc()
-
-# Função para testar o parser
-def parse_program(code):
-    result = parser.parse(code)  
-    return result
