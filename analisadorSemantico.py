@@ -5,52 +5,49 @@ class SymbolTable:
         self.symbols = {}
 
     def define(self, name, var_type):
+        """Define uma nova variável ou canal."""
         if name in self.symbols:
-            raise Exception(f"Erro: A variável '{name}' já foi declarada.")
+            raise Exception(f"Erro: '{name}' já foi declarado.")
         self.symbols[name] = var_type
 
     def lookup(self, name):
+        """Procura uma variável ou canal na tabela de símbolos."""
         if name not in self.symbols:
-            raise Exception(f"Erro: A variável '{name}' não foi declarada.")
+            raise Exception(f"Erro: '{name}' não foi declarado.")
         return self.symbols[name]
 
     def check(self, program):
-        """Verifica a semântica do programa com base nos tokens."""
+        """Verifica a semântica do programa."""
         for statement in program:
             token_type = statement[0]
             if token_type == 'IDENTIFIER':
                 var_name = statement[1]
                 self.lookup(var_name)  # Verifica se a variável foi declarada
             elif token_type in {'SEND', 'RECEIVE'}:
-                # Verifica o uso correto de operações de comunicação
                 var_name = statement[1]
-                self.lookup(var_name)  # Verifica se o canal/variável foi declarado
+                self.lookup(var_name)  # Verifica se o canal foi declarado
             elif token_type in {'IF', 'WHILE'}:
-                # Verifica se a condição contém variáveis declaradas
-                condition = statement[1]  # Supondo que a condição seja passada como lista de tokens
+                condition = statement[1]
                 for token in condition:
                     if token[0] == 'IDENTIFIER':
-                        self.lookup(token[1])  # Verifica variáveis na condição
+                        self.lookup(token[1])
             elif token_type == 'ASSIGN':
                 var_name = statement[1]
-                self.lookup(var_name)  # Verifica se a variável existe para a atribuição
-                expression = statement[2]  # Supondo que a expressão seja uma lista de tokens
+                self.lookup(var_name)
+                expression = statement[2]
                 for token in expression:
                     if token[0] == 'IDENTIFIER':
-                        self.lookup(token[1])  # Verifica variáveis na expressão
-            # Adiciona outros casos de tokens conforme necessário
-
-
+                        self.lookup(token[1])
 
 class MiniParParser:
     def __init__(self, tokens):
         self.tokens = tokens
         self.current_token_index = 0
         self.current_token = self.tokens[self.current_token_index] if tokens else None
-        self.symbol_table = SymbolTable()  # Inicializa a tabela de símbolos
+        self.symbol_table = SymbolTable()
 
-    # Função para avançar para o próximo token
     def advance(self):
+        """Avança para o próximo token."""
         self.current_token_index += 1
         if self.current_token_index < len(self.tokens):
             self.current_token = self.tokens[self.current_token_index]
@@ -58,17 +55,14 @@ class MiniParParser:
             self.current_token = None
 
     def parse(self):
-        """Inicia a análise do programa MiniPar."""
+        """Inicia a análise do programa."""
         self.programa_minipar()
 
     def programa_minipar(self):
-        """Verifica a produção 'programa_minipar'."""
         self.bloco_stmt()
-        # Após a análise sintática, verificamos a semântica
-        self.symbol_table.check(self.tokens)  # Verificação semântica
+        self.symbol_table.check(self.tokens)
 
     def bloco_stmt(self):
-        """Verifica a produção 'bloco_stmt'."""
         if self.current_token[0] == 'SEQ':
             self.bloco_SEQ()
         elif self.current_token[0] == 'PAR':
@@ -77,37 +71,34 @@ class MiniParParser:
             raise SyntaxError("Esperado 'SEQ' ou 'PAR'.")
 
     def bloco_SEQ(self):
-        """Verifica a produção 'bloco_SEQ'."""
         self.match('SEQ')
         self.stmts()
 
     def bloco_PAR(self):
-        """Verifica a produção 'bloco_PAR'."""
         self.match('PAR')
         self.stmts()
 
     def stmts(self):
-        """Verifica a produção 'stmts'."""
         while self.current_token:
             if self.current_token[0] == 'IDENTIFIER':
-                self.atribuição()
+                self.atribuicao()
             elif self.current_token[0] == 'IF':
                 self.if_stmt()
             elif self.current_token[0] == 'WHILE':
                 self.while_stmt()
+            elif self.current_token[0] == 'C_CHANNEL':
+                self.canal_com()
             else:
                 break
 
-    def atribuição(self):
-        """Verifica a produção 'atribuição'."""
+    def atribuicao(self):
         var_name = self.current_token[1]
         self.match('IDENTIFIER')
         self.match('ASSIGN')
         self.expr()
-        self.symbol_table.define(var_name, "int")  # Define o tipo como 'int' para a atribuição
+        self.symbol_table.define(var_name, "int")  # Supondo tipo padrão 'int'
 
     def if_stmt(self):
-        """Verifica a produção 'if'."""
         self.match('IF')
         self.match('LPAREN')
         self.bool_expr()
@@ -118,30 +109,34 @@ class MiniParParser:
             self.stmts()
 
     def while_stmt(self):
-        """Verifica a produção 'while'."""
         self.match('WHILE')
         self.match('LPAREN')
         self.bool_expr()
         self.match('RPAREN')
         self.stmts()
 
+    def canal_com(self):
+        self.match('C_CHANNEL')
+        channel_name = self.current_token[1]
+        self.match('IDENTIFIER')  # Nome do canal
+        sender = self.current_token[1]
+        self.match('IDENTIFIER')  # Emissor
+        receiver = self.current_token[1]
+        self.match('IDENTIFIER')  # Receptor
+        self.symbol_table.define(channel_name, "channel")  # Define canal
+
     def bool_expr(self):
-        """Verifica a expressão booleana."""
         self.match('BOOL')
 
     def expr(self):
-        """Verifica a produção 'expr'."""
-        self.match('IDENTIFIER')  # Exemplo de simplificação
+        self.match('IDENTIFIER')
         while self.current_token and self.current_token[0] in ('+', '-', '*', '/'):
-            self.match(self.current_token[0])  # Avança no operador
-            self.match('IDENTIFIER')  # Avança no operando
+            self.match(self.current_token[0])
+            self.match('IDENTIFIER')
 
     def match(self, token_type):
-        """Verifica se o próximo token é do tipo esperado."""
         if self.current_token and self.current_token[0] == token_type:
             self.advance()
         else:
             raise SyntaxError(f"Esperado '{token_type}', mas encontrado '{self.current_token}'.")
-
-
 

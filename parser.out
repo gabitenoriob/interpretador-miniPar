@@ -1,0 +1,133 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Unused terminals:
+
+    ASSIGN
+    BOOL
+    ELSE
+    EQ
+    GE
+    GT
+    LE
+    LT
+    NE
+    RECEIVE
+    SEMICOLON
+    SEND
+
+Grammar
+
+Rule 0     S' -> programa_minipar
+Rule 1     programa_minipar -> bloco_stmt
+Rule 2     bloco_stmt -> bloco_SEQ
+Rule 3     bloco_stmt -> bloco_PAR
+Rule 4     bloco_stmt -> bloco_stmt bloco_SEQ
+Rule 5     bloco_stmt -> bloco_stmt bloco_PAR
+Rule 6     bloco_SEQ -> SEQ stmts
+Rule 7     bloco_PAR -> PAR stmts
+Rule 8     bloco_IF -> IF LPAREN bool RPAREN LBRACE stmts RBRACE
+Rule 9     bloco_WHILE -> WHILE LPAREN bool RPAREN LBRACE stmts RBRACE
+Rule 10    bloco_INPUT -> INPUT LPAREN RPAREN
+Rule 11    bloco_OUTPUT -> OUTPUT LPAREN output_args RPAREN
+Rule 12    output_args -> expr
+Rule 13    output_args -> output_args COMMA expr
+Rule 14    stmts -> stmt
+Rule 15    stmts -> stmts stmt
+Rule 16    stmt -> atribuicao
+Rule 17    stmt -> bloco_IF
+Rule 18    stmt -> bloco_WHILE
+Rule 19    stmt -> bloco_INPUT
+Rule 20    stmt -> bloco_OUTPUT
+Rule 21    stmt -> c_channel
+Rule 22    stmt -> c_channel_stmt
+Rule 23    atribuicao -> ID EQUALS expr
+Rule 24    atribuicao -> ID EQUALS STRING
+Rule 25    atribuicao -> ID EQUALS bloco_INPUT
+Rule 26    atribuicao -> ID EQUALS receive_stmt
+Rule 27    expr -> INT
+Rule 28    expr -> STRING
+Rule 29    expr -> expr PLUS expr
+Rule 30    expr -> expr MINUS expr
+Rule 31    expr -> expr TIMES expr
+Rule 32    expr -> expr DIVIDE expr
+Rule 33    expr -> expr LESS_THAN expr
+Rule 34    expr -> expr GREATER_THAN expr
+Rule 35    expr -> expr LESS_THAN_EQUALS expr
+Rule 36    expr -> expr GREATER_THAN_EQUALS expr
+Rule 37    expr -> expr EQUALS_EQUALS expr
+Rule 38    expr -> expr NOT_EQUALS expr
+Rule 39    termo -> fator
+Rule 40    termo -> termo MULTIPLY fator
+Rule 41    termo -> termo DIVIDE fator
+Rule 42    fator -> IDENTIFIER
+Rule 43    fator -> NUMBER
+Rule 44    canal_com -> C_CHANNEL IDENTIFIER IDENTIFIER IDENTIFIER
+
+Terminals, with rules where they appear
+
+ASSIGN               : 
+BOOL                 : 
+COMMA                : 13
+C_CHANNEL            : 44
+DIVIDE               : 32 41
+ELSE                 : 
+EQ                   : 
+GE                   : 
+GT                   : 
+IDENTIFIER           : 42 44 44 44
+IF                   : 8
+INPUT                : 10
+LBRACE               : 8 9
+LE                   : 
+LPAREN               : 8 9 10 11
+LT                   : 
+MINUS                : 30
+MULTIPLY             : 40
+NE                   : 
+NUMBER               : 43
+OUTPUT               : 11
+PAR                  : 7
+PLUS                 : 29
+RBRACE               : 8 9
+RECEIVE              : 
+RPAREN               : 8 9 10 11
+SEMICOLON            : 
+SEND                 : 
+SEQ                  : 6
+STRING               : 24 28
+WHILE                : 9
+error                : 
+
+Nonterminals, with rules where they appear
+
+EQUALS               : 23 24 25 26
+EQUALS_EQUALS        : 37
+GREATER_THAN         : 34
+GREATER_THAN_EQUALS  : 36
+ID                   : 23 24 25 26
+INT                  : 27
+LESS_THAN            : 33
+LESS_THAN_EQUALS     : 35
+NOT_EQUALS           : 38
+TIMES                : 31
+atribuicao           : 16
+bloco_IF             : 17
+bloco_INPUT          : 19 25
+bloco_OUTPUT         : 20
+bloco_PAR            : 3 5
+bloco_SEQ            : 2 4
+bloco_WHILE          : 18
+bloco_stmt           : 1 4 5
+bool                 : 8 9
+c_channel            : 21
+c_channel_stmt       : 22
+canal_com            : 
+expr                 : 12 13 23 29 29 30 30 31 31 32 32 33 33 34 34 35 35 36 36 37 37 38 38
+fator                : 39 40 41
+output_args          : 11 13
+programa_minipar     : 0
+receive_stmt         : 26
+stmt                 : 14 15
+stmts                : 6 7 8 9 15
+termo                : 40 41
+

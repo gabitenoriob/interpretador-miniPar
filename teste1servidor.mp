@@ -1,8 +1,5 @@
 # Programa servidor (computador_2) de uma calculadora aritmética simples
 
-# Declaração do canal de comunicação
-c_channel calculadora computador_1 computador_2
-
 SEQ
     # Recebe a solicitação de operação aritmética
     calculadora.receive(operacao, valor1, valor2, resultado)
