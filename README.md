@@ -17,6 +17,7 @@ Este repositório contém um interpretador simples para a linguagem miniPar. O o
 ## Requisitos
 
 - Python 3.13
+- Bibliotca PLY (pip install ply)
 
 ## Como Usar
 
@@ -27,9 +28,11 @@ Este repositório contém um interpretador simples para a linguagem miniPar. O o
    ```
 2. Abra o terminal, navegue até a pasta do projeto e digite o seguinte comando para executar o programa:
 ```sh
-python execucao.py <nome_do_programa.mp>
+python main.py <nome_do_programa.mp>
 ```
 ***Exemplo:***
 ```sh
-python3 execucao.py teste2.mp
+python3 main.py teste2.mp
 ```
+***OBS:***
+Se for o teste1 rode em 2 terminais , 1 servidor e outro cliente. Verifique se a porta usada está liberada.
