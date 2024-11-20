@@ -168,7 +168,7 @@ def send_data(host, port, data):
         sock.close()
         #print("conexão cliente fechada")
 
-
+#
 def receive_data(host, port):
     #print(f"host: {host} port: {port}")
     # Cria um socket TCP

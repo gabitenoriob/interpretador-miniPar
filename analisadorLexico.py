@@ -1,6 +1,6 @@
 import ply.lex as lex
 import interpretador
-
+#
 # Lista de tokens
 tokens = [
     'SEQ', 'PAR', 'IF', 'ELSE', 'WHILE', 'INPUT', 'OUTPUT',
@@ -45,7 +45,7 @@ t_DOT = r'\.'
 
 # Ignorar espaços em branco e tabulações
 t_ignore = ' \t\n\r'
-
+ 
 # Definir regras para tokens complexos
 def t_ID(t):
     r'[a-zA-Z_][a-zA-Z0-9_]*'

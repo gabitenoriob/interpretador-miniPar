@@ -149,6 +149,7 @@ def p_send_stmt(p):
 def p_receive_stmt(p):
     '''receive_stmt : ID DOT RECEIVE LPAREN ID COMMA expr COMMA expr COMMA expr RPAREN
                     | ID DOT RECEIVE LPAREN ID RPAREN'''
+                    #
     if len(p) == 7:
             p[0] = (p[1], 'RECEIVE', p[5])
     elif len(p) == 13:
@@ -170,4 +171,4 @@ def p_error(p):
     parser.errok()
     
 # Criar o analisador sintático
-parser = yacc.yacc()
+parser = yacc.yacc(debug=True)

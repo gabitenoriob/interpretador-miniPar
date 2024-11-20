@@ -3,7 +3,7 @@ import analisadorLexico as lexic
 import interpretador as exec
 import sys
 import os
-
+#
 # Testar o interpretador MiniPar
         
 def read_program_from_file(file_path):
